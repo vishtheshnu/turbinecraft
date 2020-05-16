@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "turbinecraft:block/firstblock",
+    "down": "turbinecraft:block/firstblock",
+    "up": "turbinecraft:block/firstblock",
+    "east": "turbinecraft:block/firstblock",
+    "west": "turbinecraft:block/firstblock",
+    "north": "turbinecraft:block/firstblock_powered",
+    "south": "turbinecraft:block/firstblock"
+  }
+}

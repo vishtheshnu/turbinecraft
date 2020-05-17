@@ -1,5 +1,7 @@
 package com.vnator.turbinecraft.capabilities.rotational_power;
 
+import net.minecraft.nbt.CompoundNBT;
+
 public class RotationalAcceptor implements IRotationalAcceptor {
 
     private long speed;
@@ -29,5 +31,10 @@ public class RotationalAcceptor implements IRotationalAcceptor {
     @Override
     public void setForce(long force) {
         this.force = force;
+    }
+
+    @Override
+    public String toString(){
+        return "Speed: "+speed+", Force: "+force;
     }
 }

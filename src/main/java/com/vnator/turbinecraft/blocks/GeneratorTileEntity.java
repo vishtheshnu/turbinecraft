@@ -15,18 +15,10 @@ import net.minecraftforge.common.util.NonNullConsumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public abstract class GeneratorTileEntity extends TileEntity implements ITickableTileEntity {
-
-    Direction facing;
+public abstract class GeneratorTileEntity extends TileEntity {
 
     public GeneratorTileEntity(TileEntityType<?> tileEntityTypeIn) {
         super(tileEntityTypeIn);
-    }
-
-    @Override
-    public void onLoad() {
-        facing = (Direction) getBlockState().getValues().get(BlockStateProperties.FACING);
-        super.onLoad();
     }
 
     /**
@@ -36,7 +28,7 @@ public abstract class GeneratorTileEntity extends TileEntity implements ITickabl
      */
     public void transferRotation(long speed, long force){
         if(!world.isRemote){
-            //if(facing == null)
+            Direction facing = getBlockState().get(BlockStateProperties.FACING);
 
             TileEntity ent = world.getTileEntity(pos.offset(facing));
             if(ent != null){

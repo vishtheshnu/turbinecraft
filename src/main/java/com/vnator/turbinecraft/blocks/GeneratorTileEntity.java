@@ -28,7 +28,7 @@ public abstract class GeneratorTileEntity extends TileEntity {
      */
     public void transferRotation(long speed, long force){
         if(!world.isRemote){
-            Direction facing = getBlockState().get(BlockStateProperties.FACING);
+            Direction facing = getBlockState().get(BlockStateProperties.HORIZONTAL_FACING);
 
             TileEntity ent = world.getTileEntity(pos.offset(facing));
             if(ent != null){

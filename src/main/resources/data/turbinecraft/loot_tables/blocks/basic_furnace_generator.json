@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "name": "basic_furnace_generator",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "turbinecraft:basic_furnace_generator"
+        }
+      ]
+    }
+  ]
+}

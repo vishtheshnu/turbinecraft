@@ -1,5 +1,8 @@
 package com.vnator.turbinecraft.setup;
 
+import com.vnator.turbinecraft.blocks.consumers.dynamometer.DynamometerBlockRenderer;
+import com.vnator.turbinecraft.blocks.generators.t1_furnace_generator.FurnaceGeneratorRenderer;
+import com.vnator.turbinecraft.blocks.generators.t1_steam_generator.SteamGeneratorRenderer;
 import com.vnator.turbinecraft.capabilities.rotational_power.IRotationalAcceptor;
 import com.vnator.turbinecraft.capabilities.rotational_power.RotationalAcceptor;
 import com.vnator.turbinecraft.capabilities.rotational_power.RotationalAcceptorStorage;
@@ -19,5 +22,12 @@ public class ModSetup {
 
     public void init(){
         CapabilityManager.INSTANCE.register(IRotationalAcceptor.class, new RotationalAcceptorStorage(), RotationalAcceptor::new);
+
+        //Register Renderers
+        FurnaceGeneratorRenderer.register();
+        SteamGeneratorRenderer.register();
+
+        DynamometerBlockRenderer.register();
+
     }
 }

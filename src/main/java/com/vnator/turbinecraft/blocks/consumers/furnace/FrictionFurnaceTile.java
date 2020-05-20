@@ -52,8 +52,12 @@ public class FrictionFurnaceTile extends ConsumerTileEntity implements ITickable
                 int temperature = 50 + 5 * getLog2(rotation.getForce());
                 float speed = 1 + 0.1f * rotation.getSpeed();
 
-                if (canSmelt())
+                if (canSmelt()) {
                     progress += speed;
+                    world.setBlockState(pos, getBlockState().with(BlockStateProperties.POWERED, true));
+                }else{
+                    world.setBlockState(pos, getBlockState().with(BlockStateProperties.POWERED, false));
+                }
 
                 while (progress > MAX_PROGRESS) {
                     completeSmelt();
@@ -231,7 +235,7 @@ public class FrictionFurnaceTile extends ConsumerTileEntity implements ITickable
             return inventory.cast();
         }
         else if(cap == RotationProvider.ROTATION_CAPABILITY){
-            if(side == getBlockState().get(BlockStateProperties.FACING)){
+            if(side == getBlockState().get(BlockStateProperties.HORIZONTAL_FACING)){
                 return rotationAcceptor.cast();
             }
         }

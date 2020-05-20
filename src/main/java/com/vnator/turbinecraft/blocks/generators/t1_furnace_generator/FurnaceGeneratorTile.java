@@ -9,10 +9,14 @@ import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.animation.TimeValues;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.model.animation.IAnimationStateMachine;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.loading.FMLCommonLaunchHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
@@ -27,6 +31,7 @@ public class FurnaceGeneratorTile extends GeneratorTileEntity implements ITickab
     private LazyOptional<IItemHandler> inventory = LazyOptional.of(this::createInventory);
 
     private int burnTime = 0;
+    public int spinTime = 0;
 
     public FurnaceGeneratorTile() {
         super(Registration.BASIC_FURNACE_GENERATOR_TILE);
@@ -40,6 +45,7 @@ public class FurnaceGeneratorTile extends GeneratorTileEntity implements ITickab
         boolean hasBurned = burnTime > 0;
         if(burnTime > 0){
             burnTime--;
+            spinTime++;
             transferRotation(SPEED, FORCE);
             markDirty();
         }

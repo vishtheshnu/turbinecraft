@@ -3,6 +3,7 @@ package com.vnator.turbinecraft.setup;
 import com.vnator.turbinecraft.TurbineCraft;
 import com.vnator.turbinecraft.blocks.FirstBlock;
 import com.vnator.turbinecraft.blocks.FirstBlockTile;
+import com.vnator.turbinecraft.blocks.RotorBlock;
 import com.vnator.turbinecraft.blocks.consumers.dynamometer.DynamometerBlock;
 import com.vnator.turbinecraft.blocks.consumers.dynamometer.DynamometerBlockTile;
 import com.vnator.turbinecraft.blocks.consumers.furnace.FrictionFurnace;
@@ -13,6 +14,7 @@ import com.vnator.turbinecraft.blocks.generators.t1_steam_generator.SteamGenerat
 import com.vnator.turbinecraft.blocks.generators.t1_steam_generator.SteamGeneratorTile;
 import com.vnator.turbinecraft.items.FirstItem;
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
@@ -30,6 +32,8 @@ public class Registration {
     @ObjectHolder("turbinecraft:firstblock")
     public static TileEntityType<FirstBlockTile> FIRSTBLOCK_TILE;
 
+    @ObjectHolder("turbinecraft:rotor")
+    public static RotorBlock ROTOR;
 
     //Generators
     @ObjectHolder("turbinecraft:basic_furnace_generator")
@@ -69,6 +73,7 @@ public class Registration {
         event.getRegistry().register(new SteamGenerator());
         event.getRegistry().register(new DynamometerBlock());
         event.getRegistry().register(new FrictionFurnace());
+        event.getRegistry().register(new RotorBlock());
     }
 
     @SubscribeEvent

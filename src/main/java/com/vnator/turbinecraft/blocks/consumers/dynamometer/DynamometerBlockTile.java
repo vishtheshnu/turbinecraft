@@ -45,14 +45,5 @@ public class DynamometerBlockTile extends TileEntity implements ITickableTileEnt
     public void tick() {
         if(world.isRemote)
             return;
-
-        rotationAcceptor.ifPresent(rotation -> {
-            System.out.println(rotation.toString());
-        });
-
-        rotationAcceptor.ifPresent(rotation -> {
-            rotation.setSpeed(0);
-            rotation.setForce(0);
-        });
     }
 }

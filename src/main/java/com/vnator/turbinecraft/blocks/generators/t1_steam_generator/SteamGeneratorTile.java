@@ -2,12 +2,18 @@ package com.vnator.turbinecraft.blocks.generators.t1_steam_generator;
 
 import com.vnator.turbinecraft.blocks.GeneratorTileEntity;
 import com.vnator.turbinecraft.setup.Registration;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -24,7 +30,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class SteamGeneratorTile extends GeneratorTileEntity implements ITickableTileEntity {
+public class SteamGeneratorTile extends GeneratorTileEntity implements ITickableTileEntity, INamedContainerProvider {
 
     private static final long SPEED = 2, FORCE = 2;
     private static int DRAIN_AMOUNT = 2;
@@ -141,5 +147,16 @@ public class SteamGeneratorTile extends GeneratorTileEntity implements ITickable
             return tank.cast();
         }
         return super.getCapability(cap, side);
+    }
+
+    @Override
+    public ITextComponent getDisplayName() {
+        return new StringTextComponent(getType().getRegistryName().getPath());
+    }
+
+    @Nullable
+    @Override
+    public Container createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+        return new SteamGeneratorContainer(i, world, pos, playerInventory, playerEntity);
     }
 }

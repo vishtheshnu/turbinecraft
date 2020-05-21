@@ -33,7 +33,7 @@ public class DynamometerBlockTile extends TileEntity implements ITickableTileEnt
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if(cap == RotationProvider.ROTATION_CAPABILITY){
-            if(side == null || (side == getBlockState().get(BlockStateProperties.FACING)))
+            if(side == null || (side == getBlockState().get(BlockStateProperties.HORIZONTAL_FACING)))
                 return rotationAcceptor.cast();
             else
                 return super.getCapability(cap, side);

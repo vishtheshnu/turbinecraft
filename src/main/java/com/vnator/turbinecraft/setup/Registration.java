@@ -11,13 +11,16 @@ import com.vnator.turbinecraft.blocks.consumers.furnace.FrictionFurnaceTile;
 import com.vnator.turbinecraft.blocks.generators.t1_furnace_generator.FurnaceGenerator;
 import com.vnator.turbinecraft.blocks.generators.t1_furnace_generator.FurnaceGeneratorTile;
 import com.vnator.turbinecraft.blocks.generators.t1_steam_generator.SteamGenerator;
+import com.vnator.turbinecraft.blocks.generators.t1_steam_generator.SteamGeneratorContainer;
 import com.vnator.turbinecraft.blocks.generators.t1_steam_generator.SteamGeneratorTile;
 import com.vnator.turbinecraft.items.FirstItem;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -45,6 +48,8 @@ public class Registration {
     public static SteamGenerator BASIC_STEAM_GENERATOR;
     @ObjectHolder("turbinecraft:basic_steam_generator")
     public static TileEntityType<SteamGeneratorTile> BASIC_STEAM_GENERATOR_TILE;
+    @ObjectHolder("turbinecraft:basic_steam_generator")
+    public static ContainerType<SteamGeneratorContainer> BASIC_STEAM_GENERATOR_CONTAINER;
 
 
     //Consumers
@@ -101,5 +106,11 @@ public class Registration {
         //Consumers
         event.getRegistry().register(TileEntityType.Builder.create(DynamometerBlockTile::new, DYNAMOMETER_BLOCK).build(null).setRegistryName("dynamometer_block"));
         event.getRegistry().register(TileEntityType.Builder.create(FrictionFurnaceTile::new, FRICTION_FURNACE).build(null).setRegistryName("friction_furnace"));
+    }
+
+    @SubscribeEvent
+    public static void onContainerRegistry(final RegistryEvent.Register<ContainerType<?>> event){
+        /**DON'T FORGET TO REGISTER IN CLIENTPROXY'S INIT METHOD!*/
+        event.getRegistry().register(IForgeContainerType.create(((windowId, inv, data) -> new SteamGeneratorContainer(windowId, TurbineCraft.proxy.getClientWorld(), data.readBlockPos(), inv, TurbineCraft.proxy.getClientPlayer()))).setRegistryName("basic_steam_generator"));
     }
 }

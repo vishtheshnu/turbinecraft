@@ -8,7 +8,9 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.state.StateContainer;
@@ -31,6 +33,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -57,6 +60,7 @@ public class SteamGenerator extends Block {
         ItemStack hand = player.getHeldItem(handIn);
 
         AtomicBoolean hasInteracted = new AtomicBoolean(false);
+        AtomicBoolean hasUsed = new AtomicBoolean(false);
         worldIn.getTileEntity(pos).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY).ifPresent(genTank -> {
             if(FluidUtil.interactWithFluidHandler(player, handIn, genTank))
                 hasInteracted.set(true);
@@ -70,17 +74,26 @@ public class SteamGenerator extends Block {
                 if(filled == 1000){
                     genTank.fill(new FluidStack(Fluids.WATER.getFluid(), 1000), IFluidHandler.FluidAction.EXECUTE);
                     player.setHeldItem(handIn, new ItemStack(Items.BUCKET));
+                    hasUsed.set(true);
                 }
                 hasInteracted.set(true);
             });
         }
 
-        if(hasInteracted.get())
-            return ActionResultType.CONSUME;
+        if(hasInteracted.get()){
+            if(hasUsed.get())
+                return ActionResultType.CONSUME;
+            else
+                return ActionResultType.FAIL;
+        }
+
 
 
         //Open GUI
-
+        TileEntity te = worldIn.getTileEntity(pos);
+        if(te instanceof INamedContainerProvider){
+            NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) te, te.getPos());
+        }
         return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
     }
 

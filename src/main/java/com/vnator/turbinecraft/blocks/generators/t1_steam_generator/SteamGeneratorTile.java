@@ -1,6 +1,9 @@
 package com.vnator.turbinecraft.blocks.generators.t1_steam_generator;
 
 import com.vnator.turbinecraft.blocks.GeneratorTileEntity;
+import com.vnator.turbinecraft.capabilities.rotational_power.IRotationalAcceptor;
+import com.vnator.turbinecraft.capabilities.rotational_power.RotationProvider;
+import com.vnator.turbinecraft.capabilities.rotational_power.RotationalAcceptor;
 import com.vnator.turbinecraft.setup.Registration;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -30,7 +33,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class SteamGeneratorTile extends GeneratorTileEntity implements ITickableTileEntity, INamedContainerProvider {
+public class SteamGeneratorTile extends GeneratorTileEntity implements INamedContainerProvider {
 
     private static final long SPEED = 2, FORCE = 2;
     private static int DRAIN_AMOUNT = 2;
@@ -38,7 +41,8 @@ public class SteamGeneratorTile extends GeneratorTileEntity implements ITickable
     LazyOptional<IFluidHandler> tank = LazyOptional.of(this::createTank);
     LazyOptional<IItemHandler> inventory = LazyOptional.of(this::createInventory);
 
-    private int burnTime= 0;
+    private int burnTime = 0;
+    private int burnTotal = 0;
 
     public SteamGeneratorTile() {
         super(Registration.BASIC_STEAM_GENERATOR_TILE);
@@ -46,8 +50,7 @@ public class SteamGeneratorTile extends GeneratorTileEntity implements ITickable
 
     @Override
     public void tick() {
-        if(world.isRemote)
-            return;
+        super.tick();
 
         AtomicBoolean canDrain = new AtomicBoolean(false);
         tank.ifPresent(tank -> {
@@ -58,20 +61,26 @@ public class SteamGeneratorTile extends GeneratorTileEntity implements ITickable
         if(burnTime == 0 && canDrain.get()) {
             inventory.ifPresent(inv -> {
                 ItemStack burnable = inv.extractItem(0, 1, false);
-                if (burnable != null && !burnable.isEmpty())
-                    burnTime += ForgeHooks.getBurnTime(burnable);
+                if (burnable != null && !burnable.isEmpty()){
+                    burnTime = ForgeHooks.getBurnTime(burnable);
+                    burnTotal = burnTime;
+                    markDirty();
+                }
             });
         }
 
         if(canDrain.get() && burnTime > 0){
             tank.ifPresent(tank -> {
                 tank.drain(DRAIN_AMOUNT, IFluidHandler.FluidAction.EXECUTE);
+                burnTime--;
+                transferRotation(SPEED, FORCE);
+                markDirty();
+                setBlockState(BlockStateProperties.POWERED, true);
             });
-            burnTime--;
-            transferRotation(SPEED, FORCE);
-            world.setBlockState(getPos(), getBlockState().with(BlockStateProperties.POWERED, true));
         }else{
-            world.setBlockState(getPos(), getBlockState().with(BlockStateProperties.POWERED, false));
+            transferRotation(0, 0);
+            setBlockState(BlockStateProperties.POWERED, false);
+            //world.setBlockState(getPos(), getBlockState().with(BlockStateProperties.POWERED, false));
         }
     }
 
@@ -114,13 +123,18 @@ public class SteamGeneratorTile extends GeneratorTileEntity implements ITickable
         };
     }
 
+    protected IRotationalAcceptor createRotationAcceptor(){
+        return new RotationalAcceptor();
+    }
+
     @Override
     public void read(CompoundNBT compound) {
         CompoundNBT invTag = compound.getCompound("inventory");
         inventory.ifPresent(inv -> ((INBTSerializable<CompoundNBT>) inv).deserializeNBT(invTag));
-        CompoundNBT tankTag = compound.getCompound("tank");
+        //CompoundNBT tankTag = compound.getCompound("tank");
         tank.ifPresent(inv -> ((FluidTank) inv).readFromNBT(compound));
         burnTime = compound.getInt("burnTimeLeft");
+        burnTotal = compound.getInt("burnTimeTotal");
         super.read(compound);
     }
 
@@ -131,11 +145,30 @@ public class SteamGeneratorTile extends GeneratorTileEntity implements ITickable
             compound.put("inventory", nbt);
         });
         tank.ifPresent(inv -> {
-            CompoundNBT nbt = ((FluidTank) inv).writeToNBT(compound);
+            ((FluidTank) inv).writeToNBT(compound);
         });
 
         compound.putInt("burnTimeLeft", burnTime);
+        compound.putInt("burnTimeTotal", burnTotal);
         return super.write(compound);
+    }
+
+    protected CompoundNBT getMinimalUpdateNbt(){
+        CompoundNBT compound = new CompoundNBT();
+        tank.ifPresent(inv -> {
+            ((FluidTank) inv).writeToNBT(compound);
+        });
+        rotation.ifPresent(rot -> compound.put("rotation", rot.serializeNBT()));
+        compound.putInt("burnTimeLeft", burnTime);
+        compound.putInt("burnTimeTotal", burnTotal);
+        return compound;
+    }
+
+    protected void setMinimalUpdateNbt(CompoundNBT nbt){
+        tank.ifPresent(inv -> ((FluidTank) inv).readFromNBT(nbt));
+        rotation.ifPresent(rot -> rot.deserializeNBT(nbt.getCompound("rotation")));
+        burnTime = nbt.getInt("burnTimeLeft");
+        burnTotal = nbt.getInt("burnTimeTotal");
     }
 
     @Nonnull
@@ -144,6 +177,7 @@ public class SteamGeneratorTile extends GeneratorTileEntity implements ITickable
         if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY){
             return inventory.cast();
         }else if(cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY){
+            updateClient();
             return tank.cast();
         }
         return super.getCapability(cap, side);
@@ -158,5 +192,9 @@ public class SteamGeneratorTile extends GeneratorTileEntity implements ITickable
     @Override
     public Container createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
         return new SteamGeneratorContainer(i, world, pos, playerInventory, playerEntity);
+    }
+
+    public float getBurnRatio(){
+        return 1.0f*burnTime/burnTotal;
     }
 }

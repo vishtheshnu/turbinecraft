@@ -13,6 +13,8 @@ import com.vnator.turbinecraft.blocks.generators.t1_furnace_generator.FurnaceGen
 import com.vnator.turbinecraft.blocks.generators.t1_steam_generator.SteamGenerator;
 import com.vnator.turbinecraft.blocks.generators.t1_steam_generator.SteamGeneratorContainer;
 import com.vnator.turbinecraft.blocks.generators.t1_steam_generator.SteamGeneratorTile;
+import com.vnator.turbinecraft.blocks.transfer.shaft.ShaftBlock;
+import com.vnator.turbinecraft.blocks.transfer.shaft.ShaftBlockTile;
 import com.vnator.turbinecraft.items.FirstItem;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
@@ -63,6 +65,14 @@ public class Registration {
     @ObjectHolder("turbinecraft:friction_furnace")
     public static TileEntityType<FrictionFurnaceTile> FRICTION_FURNACE_TILE;
 
+
+    //Transfer
+    @ObjectHolder("turbinecraft:shaft_block")
+    public static ShaftBlock SHAFT_BLOCK;
+    @ObjectHolder("turbinecraft:shaft_block")
+    public static TileEntityType<ShaftBlockTile> SHAFT_BLOCK_TILE;
+
+
     //Item Holders
     @ObjectHolder("turbinecraft:firstitem")
     public static FirstItem FIRSTITEM;
@@ -79,6 +89,7 @@ public class Registration {
         event.getRegistry().register(new DynamometerBlock());
         event.getRegistry().register(new FrictionFurnace());
         event.getRegistry().register(new RotorBlock());
+        event.getRegistry().register(new ShaftBlock());
     }
 
     @SubscribeEvent
@@ -91,6 +102,8 @@ public class Registration {
 
         event.getRegistry().register(new BlockItem(DYNAMOMETER_BLOCK, properties).setRegistryName("dynamometer_block"));
         event.getRegistry().register(new BlockItem(FRICTION_FURNACE, properties).setRegistryName("friction_furnace"));
+
+        event.getRegistry().register(new BlockItem(SHAFT_BLOCK, properties).setRegistryName("shaft_block"));
 
         //Register items
         event.getRegistry().register(new FirstItem());
@@ -106,6 +119,8 @@ public class Registration {
         //Consumers
         event.getRegistry().register(TileEntityType.Builder.create(DynamometerBlockTile::new, DYNAMOMETER_BLOCK).build(null).setRegistryName("dynamometer_block"));
         event.getRegistry().register(TileEntityType.Builder.create(FrictionFurnaceTile::new, FRICTION_FURNACE).build(null).setRegistryName("friction_furnace"));
+        //Transfer
+        event.getRegistry().register(TileEntityType.Builder.create(ShaftBlockTile::new, SHAFT_BLOCK).build(null).setRegistryName("shaft_block"));
     }
 
     @SubscribeEvent

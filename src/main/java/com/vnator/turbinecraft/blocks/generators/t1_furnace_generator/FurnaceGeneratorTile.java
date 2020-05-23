@@ -1,6 +1,8 @@
 package com.vnator.turbinecraft.blocks.generators.t1_furnace_generator;
 
 import com.vnator.turbinecraft.blocks.GeneratorTileEntity;
+import com.vnator.turbinecraft.capabilities.rotational_power.IRotationalAcceptor;
+import com.vnator.turbinecraft.capabilities.rotational_power.RotationalAcceptor;
 import com.vnator.turbinecraft.setup.Registration;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -24,13 +26,14 @@ import net.minecraftforge.items.ItemStackHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class FurnaceGeneratorTile extends GeneratorTileEntity implements ITickableTileEntity {
+public class FurnaceGeneratorTile extends GeneratorTileEntity {
 
     private static final long SPEED = 1, FORCE = 1;
 
     private LazyOptional<IItemHandler> inventory = LazyOptional.of(this::createInventory);
 
     private int burnTime = 0;
+    private int burnTotal = 0;
     public int spinTime = 0;
 
     public FurnaceGeneratorTile() {
@@ -39,8 +42,7 @@ public class FurnaceGeneratorTile extends GeneratorTileEntity implements ITickab
 
     @Override
     public void tick() {
-        if(world.isRemote)
-            return;
+        super.tick();
 
         boolean hasBurned = burnTime > 0;
         if(burnTime > 0){
@@ -48,6 +50,8 @@ public class FurnaceGeneratorTile extends GeneratorTileEntity implements ITickab
             spinTime++;
             transferRotation(SPEED, FORCE);
             markDirty();
+        }else{
+            transferRotation(0, 0);
         }
 
         if(burnTime == 0) {
@@ -104,6 +108,20 @@ public class FurnaceGeneratorTile extends GeneratorTileEntity implements ITickab
         return super.write(compound);
     }
 
+    @Override
+    protected CompoundNBT getMinimalUpdateNbt() {
+        CompoundNBT compound = new CompoundNBT();
+        compound.putInt("burnTimeLeft", burnTime);
+        compound.putInt("burnTimeTotal", burnTotal);
+        return compound;
+    }
+
+    @Override
+    protected void setMinimalUpdateNbt(CompoundNBT nbt) {
+        burnTime = nbt.getInt("burnTimeLeft");
+        burnTotal = nbt.getInt("burnTimeTotal");
+    }
+
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
@@ -113,4 +131,8 @@ public class FurnaceGeneratorTile extends GeneratorTileEntity implements ITickab
         return super.getCapability(cap, side);
     }
 
+    @Override
+    protected IRotationalAcceptor createRotationAcceptor() {
+        return new RotationalAcceptor();
+    }
 }

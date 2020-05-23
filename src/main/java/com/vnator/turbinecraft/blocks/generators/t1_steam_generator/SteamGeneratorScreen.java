@@ -2,6 +2,7 @@ package com.vnator.turbinecraft.blocks.generators.t1_steam_generator;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.vnator.turbinecraft.capabilities.rotational_power.RotationProvider;
 import com.vnator.turbinecraft.gui.MachineGuiScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerInventory;
@@ -15,23 +16,12 @@ public class SteamGeneratorScreen extends MachineGuiScreen<SteamGeneratorContain
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        renderBackground();
-        super.render(mouseX, mouseY, partialTicks);
-        this.renderHoveredToolTip(mouseX, mouseY);
-    }
-
-    @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        drawString(Minecraft.getInstance().fontRenderer, "Foreground Text, yo", 10, 10, 0xffffff);
+        long speed = container.getTileEntity().getCapability(RotationProvider.ROTATION_CAPABILITY).map(r -> r.getSpeed()).orElse(1l);
+        long force = container.getTileEntity().getCapability(RotationProvider.ROTATION_CAPABILITY).map(r -> r.getForce()).orElse(1l);
+        //drawString(Minecraft.getInstance().fontRenderer, "Speed: "+speed, 7, 85, 0xffffff);
+        //drawString(Minecraft.getInstance().fontRenderer, "Force: "+force, 110, 85, 0xffffff);
     }
 
-    @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        RenderSystem.color4f(1, 1, 1, 1);
-        minecraft.getTextureManager().bindTexture(GUI);
-        int relX = (width - xSize)/2;
-        int relY = (height - ySize)/2;
-        blit(relX, relY, 0, 0, xSize, ySize);
-    }
+
 }

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "facing=north,powered=false": { "model": "turbinecraft:block/shaft_block" },
+    "facing=south,powered=false": { "model": "turbinecraft:block/shaft_block", "y": 180 },
+    "facing=west,powered=false": { "model": "turbinecraft:block/shaft_block", "y": 270 },
+    "facing=east,powered=false": { "model": "turbinecraft:block/shaft_block", "y": 90 },
+    "facing=up,powered=false": { "model": "turbinecraft:block/shaft_block", "x": -90 },
+    "facing=down,powered=false": { "model": "turbinecraft:block/shaft_block", "x": 90 },
+    "facing=north,powered=true": { "model": "turbinecraft:block/shaft_block" },
+    "facing=south,powered=true": { "model": "turbinecraft:block/shaft_block", "y": 180 },
+    "facing=west,powered=true": { "model": "turbinecraft:block/shaft_block", "y": 270 },
+    "facing=east,powered=true": { "model": "turbinecraft:block/shaft_block", "y": 90 },
+    "facing=up,powered=true": { "model": "turbinecraft:block/shaft_block", "x": -90 },
+    "facing=down,powered=true": { "model": "turbinecraft:block/shaft_block", "x": 90 }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=north": { "model": "turbinecraft:block/shaft_long" },
+    "facing=south": { "model": "turbinecraft:block/shaft_long"},
+    "facing=west": { "model": "turbinecraft:block/shaft_long", "y": 90 },
+    "facing=east": { "model": "turbinecraft:block/shaft_long", "y": 90 },
+    "facing=up": { "model": "turbinecraft:block/shaft_long", "x": -90 },
+    "facing=down": { "model": "turbinecraft:block/shaft_long", "x": -90 }
+  }
+}

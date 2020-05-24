@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=north": { "model": "turbinecraft:block/rod_gear" },
+    "facing=south": { "model": "turbinecraft:block/rod_gear"},
+    "facing=west": { "model": "turbinecraft:block/rod_gear", "y": 90 },
+    "facing=east": { "model": "turbinecraft:block/rod_gear", "y": 90 },
+    "facing=up": { "model": "turbinecraft:block/rod_gear", "x": -90 },
+    "facing=down": { "model": "turbinecraft:block/rod_gear", "x": 90 }
+  }
+}

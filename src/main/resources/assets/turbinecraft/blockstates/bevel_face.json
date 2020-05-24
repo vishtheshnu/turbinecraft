@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=north": { "model": "turbinecraft:block/bevel_face" },
+    "facing=south": { "model": "turbinecraft:block/bevel_face", "x":  180},
+    "facing=west": { "model": "turbinecraft:block/bevel_face", "y": 270 },
+    "facing=east": { "model": "turbinecraft:block/bevel_face", "y": 90 },
+    "facing=up": { "model": "turbinecraft:block/bevel_face", "x": -90 },
+    "facing=down": { "model": "turbinecraft:block/bevel_face", "x": 90 }
+  }
+}

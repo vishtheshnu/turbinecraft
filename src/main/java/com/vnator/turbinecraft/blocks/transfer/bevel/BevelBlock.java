@@ -1,19 +1,23 @@
-package com.vnator.turbinecraft.blocks.transfer.shaft;
+package com.vnator.turbinecraft.blocks.transfer.bevel;
 
-import com.vnator.turbinecraft.blocks.consumers.dynamometer.DynamometerBlockTile;
+import com.vnator.turbinecraft.blocks.transfer.shaft.ShaftBlockTile;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -23,15 +27,29 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class ShaftBlock extends Block {
+public class BevelBlock extends Block {
 
     private static final AxisAlignedBB aabbBox = new AxisAlignedBB(.01, .01, .01, .99, .99, .99);
 
-    public ShaftBlock() {
-        super(Properties.create(Material.IRON)
-        .sound(SoundType.METAL).hardnessAndResistance(2.0f)
-        );
-        setRegistryName("shaft_block");
+    public BevelBlock() {
+        super(Properties.create(Material.IRON).sound(SoundType.METAL).hardnessAndResistance(0.2f));
+        setRegistryName("bevel_gears");
+    }
+
+    @Override
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+        if(!player.getHeldItem(handIn).isEmpty())
+            return ActionResultType.PASS;
+
+        if(worldIn.isRemote)
+            return ActionResultType.SUCCESS;
+
+        TileEntity tile = worldIn.getTileEntity(pos);
+        if(tile != null & tile instanceof BevelTile){
+            ((BevelTile) tile).setFace(hit.getFace(), player.isSneaking());
+            return ActionResultType.SUCCESS;
+        }
+        return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
     }
 
     @Override
@@ -42,14 +60,15 @@ public class ShaftBlock extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world){
-        return new ShaftBlockTile();
+        return new BevelTile();
     }
 
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, @Nullable LivingEntity entity, ItemStack stack) {
         if (entity != null) {
             //For machines with rotational input, facing should be on the input side. Can output from opposite in TileEntity
-            world.setBlockState(pos, state.with(BlockStateProperties.FACING, getFacingFromEntity(pos, entity).getOpposite())
+            Direction fromDir = getFacingFromEntity(pos, entity).getOpposite();
+            world.setBlockState(pos, state.with(BlockStateProperties.FACING, fromDir)
                     .with(BlockStateProperties.POWERED, false), 2);
         }
     }
@@ -78,11 +97,6 @@ public class ShaftBlock extends Block {
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        return VoxelShapes.create(aabbBox);
-    }
-
-    @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
         return VoxelShapes.create(aabbBox);
     }
 }

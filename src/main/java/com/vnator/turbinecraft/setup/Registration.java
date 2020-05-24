@@ -4,6 +4,7 @@ import com.vnator.turbinecraft.TurbineCraft;
 import com.vnator.turbinecraft.blocks.FirstBlock;
 import com.vnator.turbinecraft.blocks.FirstBlockTile;
 import com.vnator.turbinecraft.blocks.RotorBlock;
+import com.vnator.turbinecraft.blocks.ShaftLongBlock;
 import com.vnator.turbinecraft.blocks.consumers.dynamometer.DynamometerBlock;
 import com.vnator.turbinecraft.blocks.consumers.dynamometer.DynamometerBlockTile;
 import com.vnator.turbinecraft.blocks.consumers.furnace.FrictionFurnace;
@@ -13,6 +14,10 @@ import com.vnator.turbinecraft.blocks.generators.t1_furnace_generator.FurnaceGen
 import com.vnator.turbinecraft.blocks.generators.t1_steam_generator.SteamGenerator;
 import com.vnator.turbinecraft.blocks.generators.t1_steam_generator.SteamGeneratorContainer;
 import com.vnator.turbinecraft.blocks.generators.t1_steam_generator.SteamGeneratorTile;
+import com.vnator.turbinecraft.blocks.transfer.bevel.BevelBlock;
+import com.vnator.turbinecraft.blocks.transfer.bevel.BevelFaceBlock;
+import com.vnator.turbinecraft.blocks.transfer.bevel.BevelTile;
+import com.vnator.turbinecraft.blocks.transfer.bevel.RodGearBlock;
 import com.vnator.turbinecraft.blocks.transfer.shaft.ShaftBlock;
 import com.vnator.turbinecraft.blocks.transfer.shaft.ShaftBlockTile;
 import com.vnator.turbinecraft.items.FirstItem;
@@ -39,6 +44,12 @@ public class Registration {
 
     @ObjectHolder("turbinecraft:rotor")
     public static RotorBlock ROTOR;
+    @ObjectHolder("turbinecraft:shaft_long")
+    public static ShaftLongBlock SHAFT;
+    @ObjectHolder("turbinecraft:bevel_face")
+    public static BevelFaceBlock BEVEL_FACE;
+    @ObjectHolder("turbinecraft:rod_gear")
+    public static RodGearBlock ROD_GEAR;
 
     //Generators
     @ObjectHolder("turbinecraft:basic_furnace_generator")
@@ -72,13 +83,18 @@ public class Registration {
     @ObjectHolder("turbinecraft:shaft_block")
     public static TileEntityType<ShaftBlockTile> SHAFT_BLOCK_TILE;
 
+    @ObjectHolder("turbinecraft:bevel_gears")
+    public static BevelBlock BEVEL_BLOCK;
+    @ObjectHolder("turbinecraft:bevel_gears")
+    public static TileEntityType<BevelTile> BEVEL_TILE;
+
 
     //Item Holders
     @ObjectHolder("turbinecraft:firstitem")
     public static FirstItem FIRSTITEM;
 
     public static void init(){
-
+        //Check ModSetup to register TileEntity/Block Renderers!
     }
 
     @SubscribeEvent
@@ -89,7 +105,11 @@ public class Registration {
         event.getRegistry().register(new DynamometerBlock());
         event.getRegistry().register(new FrictionFurnace());
         event.getRegistry().register(new RotorBlock());
+        event.getRegistry().register(new ShaftLongBlock());
+        event.getRegistry().register(new BevelFaceBlock());
+        event.getRegistry().register(new RodGearBlock());
         event.getRegistry().register(new ShaftBlock());
+        event.getRegistry().register(new BevelBlock());
     }
 
     @SubscribeEvent
@@ -104,6 +124,7 @@ public class Registration {
         event.getRegistry().register(new BlockItem(FRICTION_FURNACE, properties).setRegistryName("friction_furnace"));
 
         event.getRegistry().register(new BlockItem(SHAFT_BLOCK, properties).setRegistryName("shaft_block"));
+        event.getRegistry().register(new BlockItem(BEVEL_BLOCK, properties).setRegistryName("bevel_gears"));
 
         //Register items
         event.getRegistry().register(new FirstItem());
@@ -121,6 +142,7 @@ public class Registration {
         event.getRegistry().register(TileEntityType.Builder.create(FrictionFurnaceTile::new, FRICTION_FURNACE).build(null).setRegistryName("friction_furnace"));
         //Transfer
         event.getRegistry().register(TileEntityType.Builder.create(ShaftBlockTile::new, SHAFT_BLOCK).build(null).setRegistryName("shaft_block"));
+        event.getRegistry().register(TileEntityType.Builder.create(BevelTile::new, BEVEL_BLOCK).build(null).setRegistryName("bevel_gears"));
     }
 
     @SubscribeEvent

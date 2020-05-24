@@ -26,7 +26,7 @@ import java.util.function.Function;
 public abstract class MachineGuiScreen<T extends MachineContainer> extends ContainerScreen<T> {
 
     protected static final float[][] TIER_COLORS = new float[][]{
-            new float[]{0, 0, 0, 1},        //red
+            new float[]{0.75f, 0, 0, 1},        //red
             new float[]{1, 0, 0, 1},        //red
             new float[]{1, .5f, 0, 1},      //orange
             new float[]{1, 1, 0, 1},        //yellow
@@ -42,6 +42,7 @@ public abstract class MachineGuiScreen<T extends MachineContainer> extends Conta
     protected ResourceLocation GUI = new ResourceLocation(TurbineCraft.MOD_ID, "textures/gui/guisheet.png");
     protected int relX, relY;
     protected long timeSinceLastUpdate = System.currentTimeMillis();
+    protected int prevSpeedPixels, prevForcePixels;
 
     public MachineGuiScreen(T screenContainer, PlayerInventory inv, ITextComponent titleIn) {
         super(screenContainer, inv, titleIn);
@@ -139,8 +140,14 @@ public abstract class MachineGuiScreen<T extends MachineContainer> extends Conta
                 pixels = 60;
             else if(speed == 0)
                 pixels = 0;
+            //Rotational change animation
+            if(prevSpeedPixels > pixels)
+                prevSpeedPixels -= 1;
+            else if(prevSpeedPixels < pixels)
+                prevSpeedPixels += 1;
+
             RenderSystem.color4f(TIER_COLORS[tier][0], TIER_COLORS[tier][1], TIER_COLORS[tier][2], TIER_COLORS[tier][3]);
-            blit(relX+6, relY+71, 88+((int)System.currentTimeMillis()/30%3), 199, pixels, 10);
+            blit(relX+6, relY+71, 88+((int)System.currentTimeMillis()/30%3), 199, prevSpeedPixels, 10);
             RenderSystem.color4f(1, 1, 1,1);
 
             blit(relX+xSize-5-62, relY+70, 87, 174, 62, 12);
@@ -151,8 +158,13 @@ public abstract class MachineGuiScreen<T extends MachineContainer> extends Conta
                 pixels = 60;
             else if(force == 0)
                 pixels = 0;
+            //Rotational change animation
+            if(prevForcePixels > pixels)
+                prevForcePixels -= 1;
+            else if(prevForcePixels < pixels)
+                prevForcePixels += 1;
             RenderSystem.color4f(TIER_COLORS[tier][0], TIER_COLORS[tier][1], TIER_COLORS[tier][2], TIER_COLORS[tier][3]);
-            blit(relX+xSize-5-61+60-pixels, relY+71, 91-((int)System.currentTimeMillis()/30%3), 199, pixels, 10);
+            blit(relX+xSize-5-61+60-prevForcePixels, relY+71, 91-((int)System.currentTimeMillis()/30%3), 199, prevForcePixels, 10);
             RenderSystem.color4f(1, 1, 1,1);
         });
     }
@@ -162,7 +174,7 @@ public abstract class MachineGuiScreen<T extends MachineContainer> extends Conta
         //Tanks
         for(MachineContainer.TankHandler tank : container.tankHandlers){
             if(mouseX-relX > tank.x && mouseX - relX < tank.x + 20 &&
-                mouseY-relY > 5 && mouseY-relY < 60)
+                mouseY-relY > 5 && mouseY-relY < 65)
                 container.tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY).ifPresent(fluid -> {
 
                     List<String> tooltip = new ArrayList<>();

@@ -43,6 +43,8 @@ public abstract class GeneratorTileEntity extends TileEntity implements ITickabl
                 rot.setSpeed(speed);
                 rot.setForce(force);
             });
+            if(speed <= 0 || force <= 0)
+                return;
             Direction facing = getBlockState().get(BlockStateProperties.HORIZONTAL_FACING);
             TileEntity ent = world.getTileEntity(pos.offset(facing));
             if(ent != null){

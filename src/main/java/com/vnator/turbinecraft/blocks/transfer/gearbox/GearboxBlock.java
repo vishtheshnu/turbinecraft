@@ -1,6 +1,5 @@
-package com.vnator.turbinecraft.blocks.transfer.shaft;
+package com.vnator.turbinecraft.blocks.transfer.gearbox;
 
-import com.vnator.turbinecraft.blocks.consumers.dynamometer.DynamometerBlockTile;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -23,15 +22,13 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class ShaftBlock extends Block {
+public class GearboxBlock extends Block{
+    private static final AxisAlignedBB aabbBox = new AxisAlignedBB(.01, .01, .01, .99, .8, .99);
 
-    private static final AxisAlignedBB aabbBox = new AxisAlignedBB(.01, .01, .01, .99, .99, .99);
-
-    public ShaftBlock() {
-        super(Properties.create(Material.IRON)
-        .sound(SoundType.METAL).hardnessAndResistance(2.0f)
-        );
-        setRegistryName("shaft");
+    public GearboxBlock() {
+        super(Block.Properties.create(Material.IRON)
+                .hardnessAndResistance(.2f)
+                .sound(SoundType.METAL));
     }
 
     @Override
@@ -42,27 +39,26 @@ public class ShaftBlock extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world){
-        return new ShaftBlockTile();
+        return null;
     }
 
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, @Nullable LivingEntity entity, ItemStack stack) {
         if (entity != null) {
             //For machines with rotational input, facing should be on the input side. Can output from opposite in TileEntity
-            world.setBlockState(pos, state.with(BlockStateProperties.FACING, getFacingFromEntity(pos, entity).getOpposite())
+            world.setBlockState(pos, state.with(BlockStateProperties.HORIZONTAL_FACING, getFacingFromEntity(pos, entity).getOpposite())
                     .with(BlockStateProperties.POWERED, false), 2);
         }
     }
 
     public static Direction getFacingFromEntity(BlockPos clickedBlock, LivingEntity entity) {
         Vec3d vec = entity.getPositionVec();
-        return Direction.getFacingFromVector((float) (vec.x - clickedBlock.getX()), (float) (vec.y - clickedBlock.getY()),
-                (float) (vec.z - clickedBlock.getZ()));
+        return Direction.getFacingFromVector((float) (vec.x - clickedBlock.getX()), 0, (float) (vec.z - clickedBlock.getZ()));
     }
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder){
-        builder.add(BlockStateProperties.FACING);
+        builder.add(BlockStateProperties.HORIZONTAL_FACING);
         builder.add(BlockStateProperties.POWERED);
     }
 

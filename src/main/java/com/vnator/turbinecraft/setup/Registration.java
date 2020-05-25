@@ -18,6 +18,9 @@ import com.vnator.turbinecraft.blocks.transfer.bevel.BevelBlock;
 import com.vnator.turbinecraft.blocks.transfer.bevel.BevelFaceBlock;
 import com.vnator.turbinecraft.blocks.transfer.bevel.BevelTile;
 import com.vnator.turbinecraft.blocks.transfer.bevel.RodGearBlock;
+import com.vnator.turbinecraft.blocks.transfer.gearbox.*;
+import com.vnator.turbinecraft.blocks.transfer.junction.JunctionBlock;
+import com.vnator.turbinecraft.blocks.transfer.junction.JunctionTile;
 import com.vnator.turbinecraft.blocks.transfer.shaft.ShaftBlock;
 import com.vnator.turbinecraft.blocks.transfer.shaft.ShaftBlockTile;
 import com.vnator.turbinecraft.items.FirstItem;
@@ -50,6 +53,8 @@ public class Registration {
     public static BevelFaceBlock BEVEL_FACE;
     @ObjectHolder("turbinecraft:rod_gear")
     public static RodGearBlock ROD_GEAR;
+    @ObjectHolder("turbinecraft:gear_model")
+    public static GearBlock GEAR_MODEL;
 
     //Generators
     @ObjectHolder("turbinecraft:basic_furnace_generator")
@@ -78,15 +83,29 @@ public class Registration {
 
 
     //Transfer
-    @ObjectHolder("turbinecraft:shaft_block")
+    @ObjectHolder("turbinecraft:shaft")
     public static ShaftBlock SHAFT_BLOCK;
-    @ObjectHolder("turbinecraft:shaft_block")
+    @ObjectHolder("turbinecraft:shaft")
     public static TileEntityType<ShaftBlockTile> SHAFT_BLOCK_TILE;
 
     @ObjectHolder("turbinecraft:bevel_gears")
     public static BevelBlock BEVEL_BLOCK;
     @ObjectHolder("turbinecraft:bevel_gears")
     public static TileEntityType<BevelTile> BEVEL_TILE;
+
+    @ObjectHolder("turbinecraft:junction")
+    public static JunctionBlock JUNCTION_BLOCK;
+    @ObjectHolder("turbinecraft:junction")
+    public static TileEntityType<JunctionTile> JUNCTION_TILE;
+
+    @ObjectHolder("turbinecraft:gearbox_2")
+    public static Gearbox2Block GEARBOX_2_BLOCK;
+    @ObjectHolder("turbinecraft:gearbox_4")
+    public static Gearbox4Block GEARBOX_4_BLOCK;
+    @ObjectHolder("turbinecraft:gearbox_8")
+    public static Gearbox8Block GEARBOX_8_BLOCK;
+    @ObjectHolder("turbinecraft:gearbox_2")
+    public static TileEntityType<GearboxTile> GEARBOX_TILE;
 
 
     //Item Holders
@@ -108,8 +127,13 @@ public class Registration {
         event.getRegistry().register(new ShaftLongBlock());
         event.getRegistry().register(new BevelFaceBlock());
         event.getRegistry().register(new RodGearBlock());
+        event.getRegistry().register(new GearBlock());
         event.getRegistry().register(new ShaftBlock());
         event.getRegistry().register(new BevelBlock());
+        event.getRegistry().register(new JunctionBlock());
+        event.getRegistry().register(new Gearbox2Block());
+        event.getRegistry().register(new Gearbox4Block());
+        event.getRegistry().register(new Gearbox8Block());
     }
 
     @SubscribeEvent
@@ -123,8 +147,12 @@ public class Registration {
         event.getRegistry().register(new BlockItem(DYNAMOMETER_BLOCK, properties).setRegistryName("dynamometer_block"));
         event.getRegistry().register(new BlockItem(FRICTION_FURNACE, properties).setRegistryName("friction_furnace"));
 
-        event.getRegistry().register(new BlockItem(SHAFT_BLOCK, properties).setRegistryName("shaft_block"));
+        event.getRegistry().register(new BlockItem(SHAFT_BLOCK, properties).setRegistryName("shaft"));
         event.getRegistry().register(new BlockItem(BEVEL_BLOCK, properties).setRegistryName("bevel_gears"));
+        event.getRegistry().register(new BlockItem(JUNCTION_BLOCK, properties).setRegistryName("junction"));
+        event.getRegistry().register(new BlockItem(GEARBOX_2_BLOCK, properties).setRegistryName("gearbox_2"));
+        event.getRegistry().register(new BlockItem(GEARBOX_4_BLOCK, properties).setRegistryName("gearbox_4"));
+        event.getRegistry().register(new BlockItem(GEARBOX_8_BLOCK, properties).setRegistryName("gearbox_8"));
 
         //Register items
         event.getRegistry().register(new FirstItem());
@@ -141,8 +169,10 @@ public class Registration {
         event.getRegistry().register(TileEntityType.Builder.create(DynamometerBlockTile::new, DYNAMOMETER_BLOCK).build(null).setRegistryName("dynamometer_block"));
         event.getRegistry().register(TileEntityType.Builder.create(FrictionFurnaceTile::new, FRICTION_FURNACE).build(null).setRegistryName("friction_furnace"));
         //Transfer
-        event.getRegistry().register(TileEntityType.Builder.create(ShaftBlockTile::new, SHAFT_BLOCK).build(null).setRegistryName("shaft_block"));
+        event.getRegistry().register(TileEntityType.Builder.create(ShaftBlockTile::new, SHAFT_BLOCK).build(null).setRegistryName("shaft"));
         event.getRegistry().register(TileEntityType.Builder.create(BevelTile::new, BEVEL_BLOCK).build(null).setRegistryName("bevel_gears"));
+        event.getRegistry().register(TileEntityType.Builder.create(JunctionTile::new, JUNCTION_BLOCK).build(null).setRegistryName("junction"));
+        event.getRegistry().register(TileEntityType.Builder.create(GearboxTile::new, GEARBOX_2_BLOCK, GEARBOX_4_BLOCK, GEARBOX_8_BLOCK).build(null).setRegistryName("gearbox_2"));
     }
 
     @SubscribeEvent

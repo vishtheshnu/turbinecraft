@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "particle": "turbinecraft:block/junction_face",
+    "down": "turbinecraft:block/junction_face",
+    "up": "turbinecraft:block/junction_face",
+    "east": "turbinecraft:block/junction_face",
+    "west": "turbinecraft:block/junction_face",
+    "north": "turbinecraft:block/junction_export",
+    "south": "turbinecraft:block/junction_face"
+  }
+}

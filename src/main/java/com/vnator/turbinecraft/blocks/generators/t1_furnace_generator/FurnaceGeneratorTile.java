@@ -2,6 +2,7 @@ package com.vnator.turbinecraft.blocks.generators.t1_furnace_generator;
 
 import com.vnator.turbinecraft.blocks.GeneratorTileEntity;
 import com.vnator.turbinecraft.capabilities.rotational_power.IRotationalAcceptor;
+import com.vnator.turbinecraft.capabilities.rotational_power.RotationProvider;
 import com.vnator.turbinecraft.capabilities.rotational_power.RotationalAcceptor;
 import com.vnator.turbinecraft.setup.Registration;
 import net.minecraft.item.ItemStack;

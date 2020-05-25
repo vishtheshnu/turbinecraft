@@ -50,14 +50,12 @@ public class BevelTile extends GeneratorTileEntity {
 
                 if (!isPoweredOnFacing && world.getTileEntity(pos.offset(facing)) != null)
                     world.getTileEntity(pos.offset(facing)).getCapability(RotationProvider.ROTATION_CAPABILITY, facing.getOpposite()).ifPresent(orot -> {
-                        orot.setSpeed(rot.getSpeed());
-                        orot.setForce(rot.getForce());
+                        orot.insertEnergy(rot.getSpeed(), rot.getForce());
                     });
 
                 if (isPoweredOnFacing && world.getTileEntity(pos.offset(otherFacing)) != null)
                     world.getTileEntity(pos.offset(otherFacing)).getCapability(RotationProvider.ROTATION_CAPABILITY, otherFacing.getOpposite()).ifPresent(orot -> {
-                        orot.setSpeed(rot.getSpeed());
-                        orot.setForce(rot.getForce());
+                        orot.insertEnergy(rot.getSpeed(), rot.getForce());
                     });
             }
             rot.setSpeed(0);

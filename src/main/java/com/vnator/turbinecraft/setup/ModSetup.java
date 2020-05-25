@@ -4,6 +4,7 @@ import com.vnator.turbinecraft.blocks.consumers.dynamometer.DynamometerBlockRend
 import com.vnator.turbinecraft.blocks.generators.t1_furnace_generator.FurnaceGeneratorRenderer;
 import com.vnator.turbinecraft.blocks.generators.t1_steam_generator.SteamGeneratorRenderer;
 import com.vnator.turbinecraft.blocks.transfer.bevel.BevelRenderer;
+import com.vnator.turbinecraft.blocks.transfer.gearbox.GearboxRenderer;
 import com.vnator.turbinecraft.blocks.transfer.shaft.ShaftRenderer;
 import com.vnator.turbinecraft.capabilities.rotational_power.IRotationalAcceptor;
 import com.vnator.turbinecraft.capabilities.rotational_power.RotationalAcceptor;
@@ -33,5 +34,6 @@ public class ModSetup {
 
         ShaftRenderer.register();
         BevelRenderer.register();
+        GearboxRenderer.register();
     }
 }

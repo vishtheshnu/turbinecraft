@@ -1,6 +1,7 @@
 package com.vnator.turbinecraft.blocks.transfer.bevel;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.vnator.turbinecraft.blocks.generators.t1_steam_generator.SteamGeneratorRenderer;
 import com.vnator.turbinecraft.setup.Registration;
 import net.minecraft.block.BlockState;
@@ -25,8 +26,11 @@ public class BevelRenderer extends TileEntityRenderer<BevelTile> {
 
     @Override
     public void render(BevelTile tile, float partialTicks, MatrixStack matrix, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay) {
+        RenderSystem.color4f(.7f, .2f, .2f, .2f);
         renderGear(0, tile.otherFacing, tile, partialTicks, matrix, buffer, combinedLight, combinedOverlay);
+        RenderSystem.color4f(1, 1, 1, 1);
         renderGear(45/2, tile.getBlockState().get(BlockStateProperties.FACING), tile, partialTicks, matrix, buffer, combinedLight, combinedOverlay);
+
     }
 
     public void renderGear(float offset, Direction dir, BevelTile tile, float partialTicks, MatrixStack matrix, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay){

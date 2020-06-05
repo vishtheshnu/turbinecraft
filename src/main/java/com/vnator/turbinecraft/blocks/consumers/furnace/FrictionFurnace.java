@@ -8,6 +8,8 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -25,6 +27,7 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
@@ -43,7 +46,19 @@ public class FrictionFurnace extends Block {
 
     @Override
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        System.out.println(((FrictionFurnaceTile)worldIn.getTileEntity(pos)).getProgress());
+        if(player.isSneaking())
+            return ActionResultType.PASS;
+
+        if(worldIn.isRemote)
+            return ActionResultType.SUCCESS;
+
+        //Open GUI
+        TileEntity te = worldIn.getTileEntity(pos);
+        if(te instanceof INamedContainerProvider){
+            NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) te, te.getPos());
+            return ActionResultType.SUCCESS;
+        }
+
         return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
     }
 

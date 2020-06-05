@@ -1,25 +1,24 @@
 package com.vnator.turbinecraft.blocks.generators.t1_furnace_generator;
 
-import com.vnator.turbinecraft.blocks.GeneratorTileEntity;
+import com.vnator.turbinecraft.util.MachineItemHandler;
+import com.vnator.turbinecraft.blocks.MachineTileEntity;
 import com.vnator.turbinecraft.capabilities.rotational_power.IRotationalAcceptor;
-import com.vnator.turbinecraft.capabilities.rotational_power.RotationProvider;
 import com.vnator.turbinecraft.capabilities.rotational_power.RotationalAcceptor;
 import com.vnator.turbinecraft.setup.Registration;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.animation.TimeValues;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.model.animation.IAnimationStateMachine;
-import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.loading.FMLCommonLaunchHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
@@ -27,18 +26,37 @@ import net.minecraftforge.items.ItemStackHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class FurnaceGeneratorTile extends GeneratorTileEntity {
+public class FurnaceGeneratorTile extends MachineTileEntity implements INamedContainerProvider {
 
     private static final long SPEED = 1, FORCE = 1;
-
-    private LazyOptional<IItemHandler> inventory = LazyOptional.of(this::createInventory);
+    private static final int BURN_TIME_MULTIPLIER = 4;
 
     private int burnTime = 0;
-    private int burnTotal = 0;
+    private int burnTotal = 1;
     public int spinTime = 0;
 
     public FurnaceGeneratorTile() {
         super(Registration.BASIC_FURNACE_GENERATOR_TILE);
+        inventoryBase = NonNullList.withSize(1, ItemStack.EMPTY);
+        initInventory(new MachineItemHandler(this){
+            @Override
+            protected void onContentsChanged(int slot) {
+                markDirty();
+            }
+
+            @Override
+            public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+                return ForgeHooks.getBurnTime(stack) > 0;
+            }
+
+            @Nonnull
+            @Override
+            public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+                if(ForgeHooks.getBurnTime(stack) <= 0)
+                    return stack;
+                return super.insertItem(slot, stack, simulate);
+            }
+        }, new MachineItemHandler(this));
     }
 
     @Override
@@ -50,22 +68,31 @@ public class FurnaceGeneratorTile extends GeneratorTileEntity {
             burnTime--;
             spinTime++;
             transferRotation(SPEED, FORCE);
+            displayRotation.insertEnergy(SPEED, FORCE);
             markDirty();
         }else{
             transferRotation(0, 0);
+            displayRotation.insertEnergy(0, 0);
         }
 
         if(burnTime == 0) {
-            inventory.ifPresent(inv -> {
+            guiInventoryHandler.ifPresent(inv -> {
                 ItemStack burnable = inv.extractItem(0, 1, false);
                 if (burnable != null && !burnable.isEmpty()) {
-                    burnTime += ForgeHooks.getBurnTime(burnable);
-                    world.setBlockState(getPos(), getBlockState().with(BlockStateProperties.POWERED, true));
+                    burnTime += ForgeHooks.getBurnTime(burnable) * BURN_TIME_MULTIPLIER;
+                    burnTotal = burnTime;
+                    setBlockState(BlockStateProperties.POWERED, true);
                 } else if (hasBurned){
-                    world.setBlockState(getPos(), getBlockState().with(BlockStateProperties.POWERED, false));
+                    setBlockState(BlockStateProperties.POWERED, false);
                 }
             });
         }
+    }
+
+    public float getBurnRatio(){
+        if(burnTotal == 0)
+            return 0;
+        return 1.0f*burnTime/burnTotal;
     }
 
     private IItemHandler createInventory(){
@@ -93,41 +120,23 @@ public class FurnaceGeneratorTile extends GeneratorTileEntity {
     @Override
     public void read(CompoundNBT compound) {
         CompoundNBT invTag = compound.getCompound("inventory");
-        inventory.ifPresent(inv -> ((INBTSerializable<CompoundNBT>) inv).deserializeNBT(invTag));
         burnTime = compound.getInt("burnTimeLeft");
+        burnTotal = compound.getInt("burnTimeTotal");
         super.read(compound);
     }
 
     @Override
     public CompoundNBT write(CompoundNBT compound) {
-        inventory.ifPresent(inv -> {
-            CompoundNBT nbt = ((INBTSerializable<CompoundNBT>) inv).serializeNBT();
-            compound.put("inventory", nbt);
-        });
-
-        compound.putInt("burnTimeLeft", burnTime);
-        return super.write(compound);
-    }
-
-    @Override
-    protected CompoundNBT getMinimalUpdateNbt() {
-        CompoundNBT compound = new CompoundNBT();
         compound.putInt("burnTimeLeft", burnTime);
         compound.putInt("burnTimeTotal", burnTotal);
-        return compound;
-    }
-
-    @Override
-    protected void setMinimalUpdateNbt(CompoundNBT nbt) {
-        burnTime = nbt.getInt("burnTimeLeft");
-        burnTotal = nbt.getInt("burnTimeTotal");
+        return super.write(compound);
     }
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY){
-            return inventory.cast();
+        if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && side == null){
+            return autoInventoryHandler.cast();
         }
         return super.getCapability(cap, side);
     }
@@ -135,5 +144,16 @@ public class FurnaceGeneratorTile extends GeneratorTileEntity {
     @Override
     protected IRotationalAcceptor createRotationAcceptor() {
         return new RotationalAcceptor();
+    }
+
+    @Override
+    public ITextComponent getDisplayName() {
+        return new StringTextComponent(getType().getRegistryName().getPath());
+    }
+
+    @Nullable
+    @Override
+    public Container createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+        return new FurnaceGeneratorContainer(i, world, pos, playerInventory, playerEntity);
     }
 }

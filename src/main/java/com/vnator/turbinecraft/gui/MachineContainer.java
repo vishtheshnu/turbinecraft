@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
@@ -153,8 +154,8 @@ public abstract class MachineContainer extends Container {
         }
     }
 
-    protected void addInventories(Position position, int ... inventoryIds){
-        if(inventoryIds.length == 0)
+    protected void addInventories(Position position, IItemHandler inventorySlots, int ... slots){
+        if(slots.length == 0)
             return;
 
         int x, y, xspace, yspace, lineWidth;
@@ -163,35 +164,32 @@ public abstract class MachineContainer extends Container {
             x = 5 + 22*occupiedLeft;
             xspace = 20;
             yspace = 20;
-            y = (40-18/2) - (xspace * inventoryIds.length/lineWidth)/2;
+            y = (31) - (yspace * slots.length/lineWidth)/2;
         }else if(position == Position.RIGHT){
             lineWidth = 3 - occupiedRight;
-            x = 170 - 22*occupiedLeft;
+            x = 150 - 22*occupiedLeft;
             xspace = -20;
             yspace = 20;
-            y = (40-18/2) - (xspace * inventoryIds.length/lineWidth)/2;
+            y = (31) - (yspace * slots.length/lineWidth)/2;
         }else{
             lineWidth = 1;
             x = 88 - 9;
             xspace = 20;
             yspace = 20;
-            y = (31) - xspace*inventoryIds.length/2;
+            y = (31) - yspace*slots.length/2;
         }
 
-
-        tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(inv -> {
-            int xcount = 0, ycount = 0;
-            for (int id : inventoryIds) {
-                SlotItemHandler handler = new SlotItemHandler(inv, id, x+1 + xcount * xspace, y+1 + ycount * yspace);
-                addSlot(handler);
-                itemHandlers.add(new ItemHandler(x + xcount * xspace, y + ycount * yspace, id, handler.slotNumber));
-                xcount++;
-                if (xcount >= lineWidth) {
-                    xcount = 0;
-                    ycount++;
-                }
+        int xcount = 0, ycount = 0;
+        for (int slot : slots) {
+            MachineSlotHandler handler = new MachineSlotHandler(inventorySlots, slot, x+1 + xcount * xspace, y+1 + ycount * yspace);
+            addSlot(handler);
+            itemHandlers.add(new ItemHandler(x + xcount * xspace, y + ycount * yspace, slot, handler.slotNumber));
+            xcount++;
+            if (xcount >= lineWidth) {
+                xcount = 0;
+                ycount++;
             }
-        });
+        }
     }
 
     protected void addEnergyContainers(Position position, Direction side){

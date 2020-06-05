@@ -1,13 +1,12 @@
 package com.vnator.turbinecraft.blocks.transfer.bevel;
 
-import com.vnator.turbinecraft.blocks.GeneratorTileEntity;
+import com.vnator.turbinecraft.blocks.MachineTileEntity;
 import com.vnator.turbinecraft.capabilities.rotational_power.IRotationalAcceptor;
 import com.vnator.turbinecraft.capabilities.rotational_power.RotationProvider;
 import com.vnator.turbinecraft.capabilities.rotational_power.RotationalAcceptor;
 import com.vnator.turbinecraft.setup.Registration;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -15,7 +14,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class BevelTile extends GeneratorTileEntity {
+public class BevelTile extends MachineTileEntity {
 
     public Direction otherFacing = Direction.NORTH;
     public boolean isPoweredOnFacing = false;
@@ -32,6 +31,7 @@ public class BevelTile extends GeneratorTileEntity {
 
         rotation.ifPresent(rot -> {
             //Check if is powered
+            displayRotation.insertEnergy(rot.getSpeed(), rot.getForce());
             if(rot.getSpeed() > 0 || rot.getForce() > 0)
                 setBlockState(BlockStateProperties.POWERED, true);
             else
@@ -92,20 +92,6 @@ public class BevelTile extends GeneratorTileEntity {
     public CompoundNBT write(CompoundNBT compound) {
         compound.putInt("otherFacing", otherFacing.getIndex());
         return super.write(compound);
-    }
-
-    @Override
-    protected CompoundNBT getMinimalUpdateNbt() {
-        CompoundNBT nbt = new CompoundNBT();
-        rotation.ifPresent(rot -> nbt.put("rotation", rot.serializeNBT()));
-        nbt.putInt("otherFacing", otherFacing.getIndex());
-        return nbt;
-    }
-
-    @Override
-    protected void setMinimalUpdateNbt(CompoundNBT nbt) {
-        rotation.ifPresent(rot -> rot.deserializeNBT(nbt.getCompound("rotation")));
-        otherFacing = Direction.byIndex(nbt.getInt("otherFacing"));
     }
 
     @Override

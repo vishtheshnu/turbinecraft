@@ -1,5 +1,6 @@
 package com.vnator.turbinecraft.blocks.generators.t1_steam_generator;
 
+import com.vnator.turbinecraft.blocks.MachineTileEntity;
 import com.vnator.turbinecraft.capabilities.rotational_power.IRotationalAcceptor;
 import com.vnator.turbinecraft.capabilities.rotational_power.RotationProvider;
 import com.vnator.turbinecraft.gui.MachineContainer;
@@ -34,9 +35,10 @@ public class SteamGeneratorContainer extends MachineContainer {
         //});
 
         layoutPlayerInventorySlots(8, 92, playerInventory);
-
         addTanks(Position.LEFT, 0);
-        addInventories(Position.CENTER, 0);
+        ((MachineTileEntity) tileEntity).guiInventoryHandler.ifPresent(inv -> {
+            addInventories(Position.CENTER, inv, 0);
+        });
         addProgressIcon(false, 0, ((SteamGeneratorTile)world.getTileEntity(pos))::getBurnRatio);
     }
 

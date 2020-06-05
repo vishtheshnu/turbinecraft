@@ -1,16 +1,14 @@
 package com.vnator.turbinecraft.blocks.transfer.shaft;
 
-import com.vnator.turbinecraft.blocks.ConsumerTileEntity;
-import com.vnator.turbinecraft.blocks.GeneratorTileEntity;
+import com.vnator.turbinecraft.blocks.MachineTileEntity;
 import com.vnator.turbinecraft.capabilities.rotational_power.IRotationalAcceptor;
 import com.vnator.turbinecraft.capabilities.rotational_power.RotationProvider;
 import com.vnator.turbinecraft.capabilities.rotational_power.RotationalAcceptor;
 import com.vnator.turbinecraft.setup.Registration;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -18,7 +16,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class ShaftBlockTile extends GeneratorTileEntity {
+public class ShaftBlockTile extends MachineTileEntity {
 
     public boolean isPoweredOnFacing = false;
     private boolean isAccessedFacing = false;
@@ -53,6 +51,7 @@ public class ShaftBlockTile extends GeneratorTileEntity {
 
 
         rotation.ifPresent(rot -> {
+            displayRotation.insertEnergy(rot.getSpeed(), rot.getForce());
             if(rot.getSpeed() > 0 || rot.getForce() > 0)
                 setBlockState(BlockStateProperties.POWERED, true);
             else
@@ -77,18 +76,20 @@ public class ShaftBlockTile extends GeneratorTileEntity {
         return super.getCapability(cap, side);
     }
 
-    @Override
-    protected CompoundNBT getMinimalUpdateNbt() {
-        CompoundNBT nbt = new CompoundNBT();
-        rotation.ifPresent(rot -> nbt.put("rotation", rot.serializeNBT()));
-        nbt.putBoolean("powerOnFacing", isPoweredOnFacing);
-        return nbt;
+    public void onWrench(Direction side, PlayerEntity player){
+        setBlockState(BlockStateProperties.FACING, Direction.byIndex(getBlockState().get(BlockStateProperties.FACING).getIndex()+1));
     }
 
     @Override
-    protected void setMinimalUpdateNbt(CompoundNBT nbt) {
-        rotation.ifPresent(rot -> rot.deserializeNBT(nbt.getCompound("rotation")));
-        isPoweredOnFacing = nbt.getBoolean("powerOnFacing");
+    public void read(CompoundNBT compound) {
+        isPoweredOnFacing = compound.getBoolean("powerOnFacing");
+        super.read(compound);
+    }
+
+    @Override
+    public CompoundNBT write(CompoundNBT compound) {
+        compound.putBoolean("powerOnFacing", isPoweredOnFacing);
+        return super.write(compound);
     }
 
     @Override

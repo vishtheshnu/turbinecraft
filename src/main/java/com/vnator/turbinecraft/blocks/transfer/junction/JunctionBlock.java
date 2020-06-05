@@ -32,15 +32,6 @@ public class JunctionBlock extends Block {
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if(player.getHeldItem(handIn).getToolTypes().contains(ToolType.get("wrench"))){
-            ((JunctionTile)worldIn.getTileEntity(pos)).onWrench(hit.getFace(), player.isSneaking());
-        }
-
-        return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
-    }
-
-    @Override
     public boolean hasTileEntity(BlockState state){
         return true;
     }

@@ -1,4 +1,4 @@
-package com.vnator.turbinecraft.blocks;
+package com.vnator.turbinecraft.blocks.display;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

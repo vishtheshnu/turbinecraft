@@ -2,6 +2,8 @@ package com.vnator.turbinecraft.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.vnator.turbinecraft.TurbineCraft;
+import com.vnator.turbinecraft.blocks.MachineTileEntity;
+import com.vnator.turbinecraft.capabilities.rotational_power.IRotationalAcceptor;
 import com.vnator.turbinecraft.capabilities.rotational_power.RotationProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -46,6 +48,8 @@ public abstract class MachineGuiScreen<T extends MachineContainer> extends Conta
 
     public MachineGuiScreen(T screenContainer, PlayerInventory inv, ITextComponent titleIn) {
         super(screenContainer, inv, titleIn);
+        xSize = 176;
+        ySize = 174;
     }
 
     @Override
@@ -59,7 +63,7 @@ public abstract class MachineGuiScreen<T extends MachineContainer> extends Conta
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         //Block Name
         int width = Minecraft.getInstance().fontRenderer.getStringWidth(title.getFormattedText());
-        drawString(Minecraft.getInstance().fontRenderer, title.getFormattedText(), (relX+width)/2, relY+5, 0xffffff);
+        drawString(Minecraft.getInstance().fontRenderer, title.getFormattedText(), width/2, 5, 0xffffff);
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
     }
 
@@ -123,50 +127,52 @@ public abstract class MachineGuiScreen<T extends MachineContainer> extends Conta
                 ystart = (int)(16*(1.0-prog.ratioFunc.getRatio()));
                 yend = 16;
             }else if(prog.id == 1){
-                xend = (int)(24*(1.0-prog.ratioFunc.getRatio()));
+                xend = (int)(24*prog.ratioFunc.getRatio());
                 yend = 16;
             }
-            if(prog.ratioFunc.getRatio() > 0)
-                blit(prog.x+xstart+relX, prog.y+ystart+relY, 201+xstart, prog.id*16+ystart, xend-xstart, yend-ystart);
+            blit(prog.x+xstart+relX, prog.y+ystart+relY, 201+xstart, prog.id*16+ystart, xend-xstart, yend-ystart);
         }
 
         //Rotational Power
-        container.tileEntity.getCapability(RotationProvider.ROTATION_CAPABILITY).ifPresent(rot -> {
-            blit(relX+5, relY+70, 87, 174, 62, 12);
+        if(container.tileEntity instanceof MachineTileEntity && ((MachineTileEntity)container.tileEntity).getCapability(RotationProvider.ROTATION_CAPABILITY).isPresent()) {
+            //Only display if machine has rotation to begin with!
+            IRotationalAcceptor rot = ((MachineTileEntity) container.tileEntity).displayRotation;
+            blit(relX + 5, relY + 70, 87, 174, 62, 12);
             double speed = rot.getSpeed() == 0 ? 0 : (Math.log(rot.getSpeed()) / Math.log(2));
-            int tier = (int)speed;
-            int pixels = (int)(60.0*(speed - Math.floor(speed)));
-            if(pixels == 0 && speed != 0)
+            int tier = (int) speed;
+            int pixels = (int) (60.0 * (speed - Math.floor(speed)));
+            if (pixels == 0 && (speed != 0 || rot.getSpeed() == 1))
                 pixels = 60;
-            else if(speed == 0)
+            else if (speed == 0)
                 pixels = 0;
             //Rotational change animation
-            if(prevSpeedPixels > pixels)
+            if (prevSpeedPixels > pixels)
                 prevSpeedPixels -= 1;
-            else if(prevSpeedPixels < pixels)
+            else if (prevSpeedPixels < pixels)
                 prevSpeedPixels += 1;
 
             RenderSystem.color4f(TIER_COLORS[tier][0], TIER_COLORS[tier][1], TIER_COLORS[tier][2], TIER_COLORS[tier][3]);
-            blit(relX+6, relY+71, 88+((int)System.currentTimeMillis()/30%3), 199, prevSpeedPixels, 10);
-            RenderSystem.color4f(1, 1, 1,1);
+            blit(relX + 6, relY + 71, 88 + ((int) System.currentTimeMillis() / 30 % 3), 199, prevSpeedPixels, 10);
+            RenderSystem.color4f(1, 1, 1, 1);
 
-            blit(relX+xSize-5-62, relY+70, 87, 174, 62, 12);
+            blit(relX + xSize - 5 - 62, relY + 70, 87, 174, 62, 12);
             double force = rot.getForce() == 0 ? 0 : (Math.log(rot.getForce()) / Math.log(2));
-            tier = (int)force;
-            pixels = (int)(60.0*(force - Math.floor(force)));
-            if(pixels == 0 && force != 0)
+            tier = (int) force;
+            pixels = (int) (60.0 * (force - Math.floor(force)));
+            if (pixels == 0 && (force != 0 || rot.getForce() == 1))
                 pixels = 60;
-            else if(force == 0)
+            else if (force == 0)
                 pixels = 0;
             //Rotational change animation
-            if(prevForcePixels > pixels)
+            if (prevForcePixels > pixels)
                 prevForcePixels -= 1;
-            else if(prevForcePixels < pixels)
+            else if (prevForcePixels < pixels)
                 prevForcePixels += 1;
             RenderSystem.color4f(TIER_COLORS[tier][0], TIER_COLORS[tier][1], TIER_COLORS[tier][2], TIER_COLORS[tier][3]);
-            blit(relX+xSize-5-61+60-prevForcePixels, relY+71, 91-((int)System.currentTimeMillis()/30%3), 199, prevForcePixels, 10);
-            RenderSystem.color4f(1, 1, 1,1);
-        });
+            blit(relX + xSize - 5 - 61 + 60 - prevForcePixels, relY + 71, 91 - ((int) System.currentTimeMillis() / 30 % 3), 199, prevForcePixels, 10);
+            RenderSystem.color4f(1, 1, 1, 1);
+        }
+
     }
 
     @Override
@@ -187,25 +193,26 @@ public abstract class MachineGuiScreen<T extends MachineContainer> extends Conta
         }
 
         //Rotational Power
-        if(mouseY-relY > 70 && mouseY-relY < 82){
-            container.tileEntity.getCapability(RotationProvider.ROTATION_CAPABILITY).ifPresent(rot -> {
-                if(mouseX-relX > 5 && mouseX-relX < 67){
+        if(container.tileEntity instanceof MachineTileEntity && ((MachineTileEntity)container.tileEntity).getCapability(RotationProvider.ROTATION_CAPABILITY).isPresent()) {
+            if (mouseY - relY > 70 && mouseY - relY < 82) {
+                IRotationalAcceptor rot = ((MachineTileEntity) container.tileEntity).displayRotation;
+
+                if (mouseX - relX > 5 && mouseX - relX < 67) {
                     List<String> tooltip = new ArrayList<>();
                     tooltip.add(new StringTextComponent("Speed").applyTextStyle(TextFormatting.BOLD).getFormattedText());
-                    tooltip.add(new StringTextComponent("Tier: "+getTier(rot.getSpeed()))
+                    tooltip.add(new StringTextComponent("Tier: " + getTier(rot.getSpeed()))
                             .applyTextStyle(getTierFormat(getTier(rot.getSpeed()))).getFormattedText());
-                    tooltip.add(new StringTextComponent(rot.getSpeed()+" rps").applyTextStyle(TextFormatting.GRAY).getFormattedText());
+                    tooltip.add(new StringTextComponent(rot.getSpeed() + " rps").applyTextStyle(TextFormatting.GRAY).getFormattedText());
                     renderTooltip(tooltip, mouseX, mouseY);
-                }else if(mouseX-relX > xSize-5-62 && mouseX-relX < xSize-5){
+                } else if (mouseX - relX > xSize - 5 - 62 && mouseX - relX < xSize - 5) {
                     List<String> tooltip = new ArrayList<>();
                     tooltip.add(new StringTextComponent("Force").applyTextStyle(TextFormatting.BOLD).getFormattedText());
-                    tooltip.add(new StringTextComponent("Tier: "+getTier(rot.getForce()))
+                    tooltip.add(new StringTextComponent("Tier: " + getTier(rot.getForce()))
                             .applyTextStyle(getTierFormat(getTier(rot.getForce()))).getFormattedText());
-                    tooltip.add(new StringTextComponent(rot.getForce()+" psi").applyTextStyle(TextFormatting.GRAY).getFormattedText());
+                    tooltip.add(new StringTextComponent(rot.getForce() + " psi").applyTextStyle(TextFormatting.GRAY).getFormattedText());
                     renderTooltip(tooltip, mouseX, mouseY);
                 }
-            });
-
+            }
         }
 
         super.renderHoveredToolTip(mouseX, mouseY);

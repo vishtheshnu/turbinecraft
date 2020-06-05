@@ -1,0 +1,14 @@
+{
+  "type": "turbinecraft:alloyer",
+  "ingredient1": {
+    "item": "minecraft:iron_ingot"
+  },
+  "ingredient2": {
+    "type": "forge:nbt",
+    "item": "minecraft:coal",
+    "count": 2
+  },
+  "output": "minecraft:gold_ingot",
+  "time": 200,
+  "minForceTier": 1
+}

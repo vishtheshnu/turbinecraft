@@ -4,8 +4,8 @@ import net.minecraft.nbt.CompoundNBT;
 
 public class RotationalAcceptor implements IRotationalAcceptor {
 
-    private long speed;
-    private long force;
+    private long speed = 0;
+    private long force = 0;
 
     @Override
     public void insertEnergy(long speed, long force) {

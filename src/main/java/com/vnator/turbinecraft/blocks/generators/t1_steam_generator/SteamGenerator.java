@@ -1,21 +1,16 @@
 package com.vnator.turbinecraft.blocks.generators.t1_steam_generator;
 
-import com.vnator.turbinecraft.blocks.GeneratorTileEntity;
-import com.vnator.turbinecraft.blocks.generators.t1_furnace_generator.FurnaceGeneratorTile;
+import com.vnator.turbinecraft.blocks.MachineTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.ISound;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
@@ -30,10 +25,8 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
@@ -58,8 +51,6 @@ public class SteamGenerator extends Block {
         if(player.isSneaking())
             return ActionResultType.PASS;
 
-
-
         ItemStack hand = player.getHeldItem(handIn);
 
         AtomicBoolean hasInteracted = new AtomicBoolean(false);
@@ -73,7 +64,7 @@ public class SteamGenerator extends Block {
         });
 
         if(hasInteracted.get()){
-            ((GeneratorTileEntity)worldIn.getTileEntity(pos)).updateClient();
+            ((MachineTileEntity)worldIn.getTileEntity(pos)).updateClient();
             return ActionResultType.SUCCESS;
         }
 

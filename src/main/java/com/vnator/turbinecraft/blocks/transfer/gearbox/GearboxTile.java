@@ -1,22 +1,25 @@
 package com.vnator.turbinecraft.blocks.transfer.gearbox;
 
-import com.vnator.turbinecraft.blocks.GeneratorTileEntity;
+import com.vnator.turbinecraft.blocks.MachineTileEntity;
 import com.vnator.turbinecraft.capabilities.rotational_power.IRotationalAcceptor;
 import com.vnator.turbinecraft.capabilities.rotational_power.RotationProvider;
 import com.vnator.turbinecraft.capabilities.rotational_power.RotationalAcceptor;
 import com.vnator.turbinecraft.setup.Registration;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class GearboxTile extends GeneratorTileEntity {
+public class GearboxTile extends MachineTileEntity {
 
     public int factor;
     public boolean isSpeedMode = false;
@@ -64,6 +67,7 @@ public class GearboxTile extends GeneratorTileEntity {
 
 
         rotation.ifPresent(rot -> {
+            displayRotation.insertEnergy(rot.getSpeed(), rot.getForce());
             if(rot.getSpeed() > 0 || rot.getForce() > 0)
                 setBlockState(BlockStateProperties.POWERED, true);
             else
@@ -71,6 +75,16 @@ public class GearboxTile extends GeneratorTileEntity {
             rot.setSpeed(0);
             rot.setForce(0);
         });
+    }
+
+    public void onWrench(Direction face, boolean isSneaking, PlayerEntity player){
+        if(isSneaking) {
+            isSpeedMode = !isSpeedMode;
+            player.sendStatusMessage(new StringTextComponent(I18n.format("speedmode_"+isSpeedMode)), true);
+        }
+        else{ //Anything other than up or down
+            setBlockState(BlockStateProperties.HORIZONTAL_FACING, getBlockState().get(BlockStateProperties.HORIZONTAL_FACING).rotateY());
+        }
     }
 
     @Nonnull
@@ -89,21 +103,19 @@ public class GearboxTile extends GeneratorTileEntity {
     }
 
     @Override
-    protected CompoundNBT getMinimalUpdateNbt() {
-        CompoundNBT nbt = new CompoundNBT();
-        rotation.ifPresent(rot -> nbt.put("rotation", rot.serializeNBT()));
-        nbt.putBoolean("powerOnFacing", isPoweredOnFacing);
-        nbt.putBoolean("speedMode", isSpeedMode);
-        nbt.putInt("factor", factor);
-        return nbt;
+    public void read(CompoundNBT compound) {
+        isPoweredOnFacing = compound.getBoolean("powerOnFacing");
+        isSpeedMode = compound.getBoolean("speedMode");
+        factor = compound.getInt("factor");
+        super.read(compound);
     }
 
     @Override
-    protected void setMinimalUpdateNbt(CompoundNBT nbt) {
-        rotation.ifPresent(rot -> rot.deserializeNBT(nbt.getCompound("rotation")));
-        isPoweredOnFacing = nbt.getBoolean("powerOnFacing");
-        isSpeedMode = nbt.getBoolean("speedMode");
-        factor = nbt.getInt("factor");
+    public CompoundNBT write(CompoundNBT compound) {
+        compound.putBoolean("powerOnFacing", isPoweredOnFacing);
+        compound.putBoolean("speedMode", isSpeedMode);
+        compound.putInt("factor", factor);
+        return super.write(compound);
     }
 
     @Override

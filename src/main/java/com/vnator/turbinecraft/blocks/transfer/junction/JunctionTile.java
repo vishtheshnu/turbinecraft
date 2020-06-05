@@ -1,15 +1,17 @@
 package com.vnator.turbinecraft.blocks.transfer.junction;
 
-import com.vnator.turbinecraft.blocks.GeneratorTileEntity;
+import com.vnator.turbinecraft.blocks.MachineTileEntity;
 import com.vnator.turbinecraft.capabilities.rotational_power.IRotationalAcceptor;
 import com.vnator.turbinecraft.capabilities.rotational_power.RotationProvider;
 import com.vnator.turbinecraft.capabilities.rotational_power.RotationalMerger;
 import com.vnator.turbinecraft.setup.Registration;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -18,7 +20,7 @@ import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 //POWERED = Combine power, UNPOWERED = Split power
-public class JunctionTile extends GeneratorTileEntity {
+public class JunctionTile extends MachineTileEntity {
     public JunctionTile() {
         super(Registration.JUNCTION_TILE);
     }
@@ -29,6 +31,7 @@ public class JunctionTile extends GeneratorTileEntity {
             return;
         if(getBlockState().get(BlockStateProperties.POWERED)){
             rotation.ifPresent(myrot -> {
+                displayRotation.insertEnergy(myrot.getSpeed(), myrot.getForce());
                 Direction facing = getBlockState().get(BlockStateProperties.FACING);
                 TileEntity ent = world.getTileEntity(pos.offset(facing));
                 if(ent != null)
@@ -49,42 +52,36 @@ public class JunctionTile extends GeneratorTileEntity {
                 }
             }
 
-            rotation.ifPresent(myrot -> {
-                long speed = myrot.getSpeed();
-                long force = myrot.getForce() / numValidSides.get();
-                for(int i = 0; i < 6; i++){
-                    Direction dir = Direction.byIndex(i);
-                    if(dir != getBlockState().get(BlockStateProperties.FACING)){
-                        TileEntity ent = world.getTileEntity(pos.offset(dir));
-                        if(ent != null)
-                            ent.getCapability(RotationProvider.ROTATION_CAPABILITY, dir.getOpposite()).ifPresent(rot -> {
-                                rot.insertEnergy(speed, force);
-                            });
+            if(numValidSides.get() > 0) {
+                rotation.ifPresent(myrot -> {
+                    long speed = myrot.getSpeed();
+                    long force = myrot.getForce() / numValidSides.get();
+                    for (int i = 0; i < 6; i++) {
+                        Direction dir = Direction.byIndex(i);
+                        if (dir != getBlockState().get(BlockStateProperties.FACING)) {
+                            TileEntity ent = world.getTileEntity(pos.offset(dir));
+                            if (ent != null)
+                                ent.getCapability(RotationProvider.ROTATION_CAPABILITY, dir.getOpposite()).ifPresent(rot -> {
+                                    rot.insertEnergy(speed, force);
+                                });
+                        }
                     }
-                }
-            });
-
-        }
-    }
-
-    public void onWrench(Direction dir, boolean isSneaking){
-        if(isSneaking){
-            setBlockState(BlockStateProperties.FACING, dir);
-        }else{
-            if(dir == getBlockState().get(BlockStateProperties.FACING)){
-                setBlockState(BlockStateProperties.POWERED, !getBlockState().get(BlockStateProperties.POWERED));
+                    myrot.setSpeed(0);
+                    myrot.setForce(0);
+                });
             }
         }
     }
 
-    @Override
-    protected CompoundNBT getMinimalUpdateNbt() {
-        return null;
-    }
-
-    @Override
-    protected void setMinimalUpdateNbt(CompoundNBT nbt) {
-
+    public void onWrench(Direction dir, PlayerEntity player){
+        if(player.isSneaking()){
+            setBlockState(BlockStateProperties.POWERED, !getBlockState().get(BlockStateProperties.POWERED));
+            player.sendStatusMessage(new StringTextComponent(I18n.format("junction_powermode_"
+                    +getBlockState().get(BlockStateProperties.POWERED))), true);
+        }else{
+            int bsIndex = getBlockState().get(BlockStateProperties.FACING).getIndex();
+            setBlockState(BlockStateProperties.FACING, Direction.byIndex(bsIndex+1));
+        }
     }
 
     @Override

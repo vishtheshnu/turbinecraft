@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=north": { "model": "turbinecraft:block/rotopump" },
+    "facing=south": { "model": "turbinecraft:block/rotopump", "y": 180 },
+    "facing=west": { "model": "turbinecraft:block/rotopump", "y": 270 },
+    "facing=east": { "model": "turbinecraft:block/rotopump", "y": 90 },
+    "facing=up": { "model": "turbinecraft:block/rotopump", "x": -90 },
+    "facing=down": { "model": "turbinecraft:block/rotopump", "x": 90 }
+  }
+}

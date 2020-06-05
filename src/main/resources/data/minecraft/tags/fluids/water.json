@@ -1,0 +1,19 @@
+{
+  "replace": false,
+  "values": [
+    "turbinecraft:steam",
+    "turbinecraft:steam_flowing",
+    "turbinecraft:oil",
+    "turbinecraft:oil_flowing",
+    "turbinecraft:gasoline",
+    "turbinecraft:gasoline_flowing",
+    "turbinecraft:diesel",
+    "turbinecraft:diesel_flowing",
+    "turbinecraft:naphtha",
+    "turbinecraft:naphtha_flowing",
+    "turbinecraft:ethanol",
+    "turbinecraft:ethanol_flowing",
+    "turbinecraft:e50",
+    "turbinecraft:e50_flowing"
+  ]
+}

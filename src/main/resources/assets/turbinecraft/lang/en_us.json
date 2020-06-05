@@ -2,6 +2,25 @@
   "item.turbinecraft.firstitem": "Mega Pick",
   "block.turbinecraft.firstblock": "First Block",
 
+  "block.turbinecraft.basic_furnace_generator": "Furnace Engine",
+  "block.turbinecraft.basic_steam_generator": "Steam Engine",
+
+  "block.turbinecraft.bevel_gears": "Bevel Gears",
+  "block.turbinecraft.junction": "Junction",
+  "block.turbinecraft.shaft": "Shaft",
+  "block.turbinecraft.gearbox_2": "Gearbox x2",
+  "block.turbinecraft.gearbox_4": "Gearbox x4",
+  "block.turbinecraft.gearbox_8": "Gearbox x8",
+
+  "block.turbinecraft.dynamometer_block": "Dynamometer",
+  "block.turbinecraft.friction_furnace": "Friction Furnace",
+  "block.turbinecraft.rotopump": "Roto-pump",
+
   "_comment": "Creative Tab",
-  "itemGroup.turbinecraft": "Turbinecraft"
+  "itemGroup.turbinecraft": "Turbinecraft",
+
+  "speedmode_true": "Gearbox on Speed Mode",
+  "speedmode_false": "Gearbox on Force Mode",
+  "junction_powermode_true": "Junction Combining Power",
+  "junction_powermode_false": "Junction Splitting Power"
 }

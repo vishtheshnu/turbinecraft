@@ -11,14 +11,12 @@ import net.minecraft.util.text.ITextComponent;
 public class SteamGeneratorScreen extends MachineGuiScreen<SteamGeneratorContainer> {
     public SteamGeneratorScreen(SteamGeneratorContainer screenContainer, PlayerInventory inv, ITextComponent titleIn) {
         super(screenContainer, inv, titleIn);
-        xSize = 176;
-        ySize = 174;
     }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        long speed = container.getTileEntity().getCapability(RotationProvider.ROTATION_CAPABILITY).map(r -> r.getSpeed()).orElse(1l);
-        long force = container.getTileEntity().getCapability(RotationProvider.ROTATION_CAPABILITY).map(r -> r.getForce()).orElse(1l);
+        //long speed = container.getTileEntity().getCapability(RotationProvider.ROTATION_CAPABILITY).map(r -> r.getSpeed()).orElse(1l);
+        //long force = container.getTileEntity().getCapability(RotationProvider.ROTATION_CAPABILITY).map(r -> r.getForce()).orElse(1l);
         //drawString(Minecraft.getInstance().fontRenderer, "Speed: "+speed, 7, 85, 0xffffff);
         //drawString(Minecraft.getInstance().fontRenderer, "Force: "+force, 110, 85, 0xffffff);
     }
